@@ -6,6 +6,6 @@ COPY . .
 RUN go get -d -v github.com/gorilla/mux
 RUN go build main.go
 
-CMD ["main"]
+CMD ["./main"]
 
 EXPOSE 8080
