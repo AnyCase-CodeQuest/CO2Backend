@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"static"
 	"storage"
 
 	"github.com/gorilla/mux"
@@ -62,6 +63,8 @@ func getOneEvent(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
+	spa := static.SpaHandler{StaticPath: "build", IndexPath: "index.html"}
+	router.PathPrefix("/spa").Handler(spa)
 	router.HandleFunc("/", homeLink).Methods(http.MethodGet)
 	router.HandleFunc("/event", createEvent).Methods(http.MethodPost).Headers("Content-Type", "application/json")
 	router.HandleFunc("/event/latest", getLatestEvent).Methods(http.MethodGet).Headers("Content-Type", "application/json")

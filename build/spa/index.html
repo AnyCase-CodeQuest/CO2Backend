@@ -1,0 +1,32 @@
+<html>
+<head>
+    <link rel="stylesheet" href="css/main.css">
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn3.devexpress.com/jslib/19.2.4/js/dx.all.js"></script>
+    <script src="js/main.js"></script>
+</head>
+<body>
+<main class="main">
+    <h1 class="main__title">CO<sup>2</sup> Chart</h1>
+
+    <div class="gauge-container">
+        <div id="temp" class="gauge"></div>
+        <div id="co2" class="gauge"></div>
+        <div id="humidity" class="gauge"></div>
+    </div>
+</main>
+
+<svg width="0" height="0" version="1.1" class="gradient-mask" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="gradientGauge">
+            <stop class="color-green" offset="0%"/>
+            <stop class="color-yellow" offset="20%"/>
+            <stop class="color-red" offset="100%"/>
+        </linearGradient>
+    </defs>
+</svg>
+</body>
+</html>
