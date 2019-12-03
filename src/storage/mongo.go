@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
+	"os"
 )
 
 var Client *mongo.Client
@@ -13,8 +14,8 @@ var Client *mongo.Client
 func InitClient() {
 	if isConnectionActive() != true {
 		log.Println("made new connection")
-		clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
-		auth := options.Credential{Password: "kube", Username: "root"}
+		clientOptions := options.Client().ApplyURI(os.Getenv("DATABASE_CONNECTION"))
+		auth := options.Credential{Password: os.Getenv("PASSWORD"), Username: os.Getenv("USERNAME")}
 		clientOptions.SetAuth(auth)
 		var err error
 		Client, err = mongo.NewClient(clientOptions)
@@ -42,5 +43,5 @@ func isConnectionActive() bool {
 
 func GetCollection() *mongo.Collection {
 	InitClient()
-	return Client.Database("co2").Collection("values")
+	return Client.Database(os.Getenv("DATABASE")).Collection(os.Getenv("COLLECTION"))
 }
