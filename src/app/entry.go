@@ -6,27 +6,12 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
+
+	"storage"
 
 	"github.com/gorilla/mux"
 )
-
-type event struct {
-	DeviceId    string  `json:"deviceId"`
-	Co2         int     `json:"cO2"`
-	Temperature float32 `json:"temperature"`
-	Humidity    int     `json:"humidity"`
-}
-
-type allEvents []event
-
-var events = allEvents{
-	{
-		DeviceId:    "fa238a69-03ab-40d1-a51c-eb384844d243",
-		Co2:         500,
-		Temperature: 24.2,
-		Humidity:    44,
-	},
-}
 
 type myNotFoundHandler struct {
 }
@@ -43,41 +28,56 @@ func homeLink(w http.ResponseWriter, r *http.Request) {
 
 func createEvent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	var newEvent event
+	var newEvent storage.Event
+	newEvent.Date = time.Now()
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Fprintf(w, "Kindly enter data with the event title and description only in order to update")
 	}
 
 	json.Unmarshal(reqBody, &newEvent)
-	events = append(events, newEvent)
-	w.WriteHeader(http.StatusCreated)
+	err = storage.Create(newEvent)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println(err)
+	} else {
+		w.WriteHeader(http.StatusCreated)
+	}
 
 	json.NewEncoder(w).Encode(newEvent)
 }
 
 func getOneEvent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	eventID := mux.Vars(r)["id"]
+	w.WriteHeader(http.StatusNotImplemented)
+	//eventID := mux.Vars(r)["id"]
 
-	for _, singleEvent := range events {
-		if singleEvent.DeviceId == eventID {
-			json.NewEncoder(w).Encode(singleEvent)
-		}
-	}
-}
-
-func getAllEvents(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(events)
+	//for _, singleEvent := range events {
+	//	if singleEvent.DeviceId == eventID {
+	//		json.NewEncoder(w).Encode(singleEvent)
+	//	}
+	//}
 }
 
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/", homeLink).Methods(http.MethodPost)
+	router.HandleFunc("/", homeLink).Methods(http.MethodGet)
 	router.HandleFunc("/event", createEvent).Methods(http.MethodPost).Headers("Content-Type", "application/json")
-	router.HandleFunc("/events", getAllEvents).Methods(http.MethodGet).Headers("Content-Type", "application/json")
+	router.HandleFunc("/event/latest", getLatestEvent).Methods(http.MethodGet).Headers("Content-Type", "application/json")
 	router.HandleFunc("/events/{id}", getOneEvent).Methods(http.MethodGet).Headers("Content-Type", "application/json")
 	router.NotFoundHandler = &myNotFoundHandler{}
 	log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+func getLatestEvent(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	singleEvent, err := storage.GetLatest()
+	if err != nil {
+		log.Println("can't get latest value", err)
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		json.NewEncoder(w).Encode(singleEvent)
+	}
+
 }

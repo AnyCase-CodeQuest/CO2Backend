@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  mongo:
+    image: mongo:4
+    environment:
+      MONGO_INITDB_ROOT_PASSWORD: kube
+      MONGO_INITDB_ROOT_USERNAME: root
+    ports:
+    - 27017:27017
