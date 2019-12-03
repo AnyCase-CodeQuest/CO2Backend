@@ -7,7 +7,8 @@ import (
 )
 
 func Create(event Event) error {
-	_, err := GetClient().Database("co2").Collection("values").InsertOne(context.TODO(), event)
+	InitClient()
+	_, err := Client.Database("co2").Collection("values").InsertOne(context.TODO(), event)
 	if err != nil {
 		log.Fatalln("Error on inserting new Hero", err)
 	}
