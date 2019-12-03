@@ -118,7 +118,7 @@ $(function() {
         //     let gauge = new GaugeChart(item, params);
         //     gauge.init();
         // });
-        setInterval(updateCo2Handler, 20);
+        setInterval(updateCo2Handler, 20000);
         // $('#random').click(function() {
         //
         //     $('.gauge').each(function(index, item) {
