@@ -74,7 +74,7 @@ $(function() {
 
     function updateCo2Handler() {
         $.ajax({
-            url: "http://sensors.sahnovsky.life/event/latest",
+            url: "../event/latest",
             headers: {"Content-Type": "application/json"},
             context: document.body
         }).done(function(data) {
