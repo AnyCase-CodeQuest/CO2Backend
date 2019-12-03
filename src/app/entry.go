@@ -72,8 +72,7 @@ func main() {
 
 func getLatestEvent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
-	singleEvent, err := storage.GetLatest(1)
+	singleEvent, err := storage.GetLatest()
 	if err != nil {
 		log.Println("can't get latest value", err)
 		w.WriteHeader(http.StatusInternalServerError)
