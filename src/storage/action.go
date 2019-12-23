@@ -12,7 +12,7 @@ func Create(event Event) error {
 	InitClient()
 	_, err := GetCollection().InsertOne(context.TODO(), event)
 	if err != nil {
-		log.Fatalln("Error on inserting new Hero", err)
+		log.Fatalln("Error on inserting new sensor value", err)
 	}
 	log.Println(fmt.Sprintf("%+v", event))
 	return nil
