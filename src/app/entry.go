@@ -3,13 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/AnyCase-Company-LTD/CO2Backend/src/static"
+	"github.com/AnyCase-Company-LTD/CO2Backend/src/storage"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
-
-	"static"
-	"storage"
 
 	"github.com/gorilla/mux"
 )
@@ -82,5 +81,4 @@ func getLatestEvent(w http.ResponseWriter, r *http.Request) {
 	} else {
 		json.NewEncoder(w).Encode(singleEvent)
 	}
-
 }
