@@ -3,11 +3,14 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/AnyCase-Company-LTD/CO2Backend/src/message"
 	"github.com/AnyCase-Company-LTD/CO2Backend/src/static"
 	"github.com/AnyCase-Company-LTD/CO2Backend/src/storage"
+	"github.com/AnyCase-Company-LTD/CO2Backend/src/values"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -38,6 +41,11 @@ func createEvent(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &newEvent)
 	err = storage.Create(newEvent)
 
+	if os.Getenv(values.EnvSendToQueue) == "1" {
+		msg, _ := json.Marshal(newEvent)
+		go message.SendMessageToQueue(msg)
+	}
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err)
@@ -51,13 +59,6 @@ func createEvent(w http.ResponseWriter, r *http.Request) {
 func getOneEvent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNotImplemented)
-	//eventID := mux.Vars(r)["id"]
-
-	//for _, singleEvent := range events {
-	//	if singleEvent.DeviceId == eventID {
-	//		json.NewEncoder(w).Encode(singleEvent)
-	//	}
-	//}
 }
 
 func main() {
