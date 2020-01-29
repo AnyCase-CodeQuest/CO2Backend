@@ -1,11 +1,8 @@
-FROM golang:1.13
+FROM alpine:3.11
 
 WORKDIR /app
-COPY ./src /app/src
-COPY ./go.mod /app/go.mod
-COPY ./go.sum /app/go.sum
-RUN GOOS=linux GOARM=7 go build -o /app/main /app/src/app/entry.go
 COPY ./build /app/build
+COPY ./bin/main /app/main
 
 CMD ["/app/main"]
 
