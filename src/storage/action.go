@@ -2,11 +2,11 @@ package storage
 
 import (
 	"context"
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
 )
+
+import log "github.com/sirupsen/logrus"
 
 func Create(event Event) error {
 	InitClient()
@@ -14,7 +14,7 @@ func Create(event Event) error {
 	if err != nil {
 		log.Fatalln("Error on inserting new sensor value", err)
 	}
-	log.Println(fmt.Sprintf("%+v", event))
+	log.Debugf("Received event and stored to DB: %+v", event)
 	return nil
 }
 

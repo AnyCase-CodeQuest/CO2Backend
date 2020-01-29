@@ -8,7 +8,6 @@ import (
 	"github.com/AnyCase-Company-LTD/CO2Backend/src/storage"
 	"github.com/AnyCase-Company-LTD/CO2Backend/src/values"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -16,13 +15,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
+import log "github.com/sirupsen/logrus"
+
 type myNotFoundHandler struct {
 }
 
 func (*myNotFoundHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 	fmt.Fprintf(w, "not found page: %s", r.URL.Path)
-	log.Println(fmt.Sprintf("404 page: %s; IP: %s; body: %s", r.URL.Path, r.RemoteAddr, r.Body))
+	log.Warnf("404 page: %s; IP: %s; body: %s", r.URL.Path, r.RemoteAddr, r.Body)
 }
 
 func homeLink(w http.ResponseWriter, r *http.Request) {
@@ -48,7 +49,7 @@ func createEvent(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Println(err)
+		log.Error(err)
 	} else {
 		w.WriteHeader(http.StatusCreated)
 	}
@@ -62,6 +63,7 @@ func getOneEvent(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	setupEnv()
 	router := mux.NewRouter().StrictSlash(true)
 	spa := static.SpaHandler{StaticPath: "build", IndexPath: "index.html"}
 	router.PathPrefix("/spa").Handler(spa)
@@ -70,16 +72,33 @@ func main() {
 	router.HandleFunc("/event/latest", getLatestEvent).Methods(http.MethodGet).Headers("Content-Type", "application/json")
 	router.HandleFunc("/events/{id}", getOneEvent).Methods(http.MethodGet).Headers("Content-Type", "application/json")
 	router.NotFoundHandler = &myNotFoundHandler{}
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.WithError(http.ListenAndServe(":8080", router)).Fatal()
 }
 
 func getLatestEvent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	singleEvent, err := storage.GetLatest()
 	if err != nil {
-		log.Println("can't get latest value", err)
+		log.Error("can't get latest value", err)
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
 		json.NewEncoder(w).Encode(singleEvent)
+	}
+}
+
+func setupEnv() {
+	switch environment := os.Getenv(values.ENV_ENV); environment {
+	case values.Env_prod:
+		log.SetLevel(log.WarnLevel)
+		break
+	case values.Env_dev:
+		log.SetLevel(log.DebugLevel)
+	default:
+		log.Warnf("No env variable set: \"%s\" Set as \"dev\" default", values.ENV_ENV)
+		err := os.Setenv(values.ENV_ENV, "dev")
+		if err != nil {
+			log.Error(err)
+		}
+		log.SetLevel(log.DebugLevel)
 	}
 }
