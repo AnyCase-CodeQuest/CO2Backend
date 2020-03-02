@@ -87,15 +87,15 @@ func getLatestEvent(w http.ResponseWriter, r *http.Request) {
 }
 
 func setupEnv() {
-	switch environment := os.Getenv(values.ENV_ENV); environment {
-	case values.Env_prod:
+	switch environment := os.Getenv(values.EnvEnv); environment {
+	case values.EnvProd:
 		log.SetLevel(log.WarnLevel)
 		break
-	case values.Env_dev:
+	case values.EnvDev:
 		log.SetLevel(log.DebugLevel)
 	default:
-		log.Warnf("No env variable set: \"%s\" Set as \"dev\" default", values.ENV_ENV)
-		err := os.Setenv(values.ENV_ENV, "dev")
+		log.Warnf("No env variable set: \"%s\" Set as \"dev\" default", values.EnvEnv)
+		err := os.Setenv(values.EnvEnv, "dev")
 		if err != nil {
 			log.Error(err)
 		}
