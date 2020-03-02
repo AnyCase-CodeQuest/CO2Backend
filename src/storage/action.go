@@ -11,7 +11,7 @@ import log "github.com/sirupsen/logrus"
 
 func Create(event Event) error {
 	InitClient()
-	_, err := GetCollection().InsertOne(context.TODO(), event)
+	_, err := GetDataCollection().InsertOne(context.TODO(), event)
 	if err != nil {
 		log.Fatalln("Error on inserting new sensor value", err)
 	}
@@ -24,7 +24,7 @@ func GetLatest() (Event, error) {
 	filter := bson.M{}
 	var findOneOptions options.FindOneOptions
 	findOneOptions.SetSort(bson.M{"_id": -1})
-	documentReturned := GetCollection().FindOne(context.TODO(), filter, &findOneOptions)
+	documentReturned := GetDataCollection().FindOne(context.TODO(), filter, &findOneOptions)
 
 	documentReturned.Decode(&event)
 
@@ -41,7 +41,7 @@ func GetLatestBy(id string) (Event, error) {
 	filter := bson.M{"deviceid": id}
 	var findOneOptions options.FindOneOptions
 	findOneOptions.SetSort(bson.M{"_id": -1})
-	documentReturned := GetCollection().FindOne(context.TODO(), filter, &findOneOptions)
+	documentReturned := GetDataCollection().FindOne(context.TODO(), filter, &findOneOptions)
 
 	documentReturned.Decode(&event)
 
@@ -54,12 +54,12 @@ func GetLatestBy(id string) (Event, error) {
 }
 
 func GetSensorList() SensorList {
-	var list SensorList
+	var list = SensorList{}
 	filter := bson.M{}
 	ctx, _ := context.WithTimeout(context.TODO(), 30*time.Second)
 	var findOptions options.FindOptions
 	findOptions.SetSort(bson.M{"_id": -1})
-	cursor, err := GetCollection().Find(ctx, filter, &findOptions)
+	cursor, err := GetSensorCollection().Find(ctx, filter, &findOptions)
 
 	if err != nil {
 		return list
@@ -70,7 +70,7 @@ func GetSensorList() SensorList {
 		if err != nil {
 			log.Fatal(err)
 		}
-		list.data = append(list.data, result)
+		list.Data = append(list.Data, result)
 	}
 	defer cursor.Close(ctx)
 	return list

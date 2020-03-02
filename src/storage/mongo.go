@@ -41,7 +41,12 @@ func isConnectionActive() bool {
 	}
 }
 
-func GetCollection() *mongo.Collection {
+func GetDataCollection() *mongo.Collection {
 	InitClient()
-	return Client.Database(os.Getenv("DATABASE")).Collection(os.Getenv("COLLECTION"))
+	return Client.Database(os.Getenv("DATABASE")).Collection(os.Getenv("COLLECTION_DATA"))
+}
+
+func GetSensorCollection() *mongo.Collection {
+	InitClient()
+	return Client.Database(os.Getenv("DATABASE")).Collection(os.Getenv("COLLECTION_SENSOR"))
 }

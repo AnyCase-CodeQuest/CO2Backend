@@ -101,9 +101,9 @@ func getLatestSensor(w http.ResponseWriter, r *http.Request) {
 
 func getSensorList(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	singleEvent := storage.GetSensorList()
+	sensorList := storage.GetSensorList()
 
-	json.NewEncoder(w).Encode(singleEvent)
+	json.NewEncoder(w).Encode(sensorList.Data)
 
 }
 

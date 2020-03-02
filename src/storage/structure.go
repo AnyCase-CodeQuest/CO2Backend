@@ -18,5 +18,5 @@ type Sensor struct {
 }
 
 type SensorList struct {
-	data []Sensor
+	Data []Sensor `json:"data"`
 }
