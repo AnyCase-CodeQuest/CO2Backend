@@ -70,7 +70,8 @@ func main() {
 	router.HandleFunc("/", homeLink).Methods(http.MethodGet)
 	router.HandleFunc("/event", createEvent).Methods(http.MethodPost).Headers("Content-Type", "application/json")
 	router.HandleFunc("/event/latest", getLatestEvent).Methods(http.MethodGet).Headers("Content-Type", "application/json")
-	router.HandleFunc("/events/{id}", getOneEvent).Methods(http.MethodGet).Headers("Content-Type", "application/json")
+	router.HandleFunc("/api/v1/sensor/{id}/latest", getLatestSensor).Methods(http.MethodGet).Headers("Content-Type", "application/json")
+	router.HandleFunc("/api/v1/sensor-list", getSensorList).Methods(http.MethodGet).Headers("Content-Type", "application/json")
 	router.NotFoundHandler = &myNotFoundHandler{}
 	log.WithError(http.ListenAndServe(":8080", router)).Fatal()
 }
@@ -84,6 +85,26 @@ func getLatestEvent(w http.ResponseWriter, r *http.Request) {
 	} else {
 		json.NewEncoder(w).Encode(singleEvent)
 	}
+}
+
+func getLatestSensor(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	w.Header().Set("Content-Type", "application/json")
+	singleEvent, err := storage.GetLatestBy(vars["id"])
+	if err != nil {
+		log.Error("can't get latest value", err)
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		json.NewEncoder(w).Encode(singleEvent)
+	}
+}
+
+func getSensorList(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	singleEvent := storage.GetSensorList()
+
+	json.NewEncoder(w).Encode(singleEvent)
+
 }
 
 func setupEnv() {
