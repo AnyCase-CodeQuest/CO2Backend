@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/AnyCase-Company-LTD/CO2Backend/src/message"
-	"github.com/AnyCase-Company-LTD/CO2Backend/src/static"
 	"github.com/AnyCase-Company-LTD/CO2Backend/src/storage"
 	"github.com/AnyCase-Company-LTD/CO2Backend/src/values"
 	"io/ioutil"
@@ -65,8 +64,6 @@ func getOneEvent(w http.ResponseWriter, r *http.Request) {
 func main() {
 	setupEnv()
 	router := mux.NewRouter().StrictSlash(true)
-	spa := static.SpaHandler{StaticPath: "build", IndexPath: "index.html"}
-	router.PathPrefix("/spa").Handler(spa)
 	router.HandleFunc("/", homeLink).Methods(http.MethodGet)
 	router.HandleFunc("/event", createEvent).Methods(http.MethodPost).Headers("Content-Type", "application/json")
 	router.HandleFunc("/event/latest", getLatestEvent).Methods(http.MethodGet).Headers("Content-Type", "application/json")
