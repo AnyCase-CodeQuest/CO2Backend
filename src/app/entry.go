@@ -70,8 +70,8 @@ func main() {
 	router.HandleFunc("/", homeLink).Methods(http.MethodGet)
 	router.HandleFunc("/event", createEvent).Methods(http.MethodPost).Headers("Content-Type", "application/json")
 	router.HandleFunc("/event/latest", getLatestEvent).Methods(http.MethodGet).Headers("Content-Type", "application/json")
-	router.HandleFunc("/api/v1/sensor/{id}/latest", getLatestSensor).Methods(http.MethodGet).Headers("Content-Type", "application/json")
-	router.HandleFunc("/api/v1/sensor-list", getSensorList).Methods(http.MethodGet).Headers("Content-Type", "application/json")
+	router.HandleFunc("/api/v1/sensor/{id}/latest", getLatestSensor).Methods(http.MethodGet, http.MethodOptions)
+	router.HandleFunc("/api/v1/sensor-list", getSensorList).Methods(http.MethodGet, http.MethodOptions)
 	router.NotFoundHandler = &myNotFoundHandler{}
 	log.WithError(http.ListenAndServe(":8080", router)).Fatal()
 }
@@ -90,21 +90,36 @@ func getLatestEvent(w http.ResponseWriter, r *http.Request) {
 func getLatestSensor(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	w.Header().Set("Content-Type", "application/json")
-	singleEvent, err := storage.GetLatestBy(vars["id"])
-	if err != nil {
-		log.Error("can't get latest value", err)
-		w.WriteHeader(http.StatusInternalServerError)
-	} else {
-		json.NewEncoder(w).Encode(singleEvent)
+	setupCORS(w)
+
+	if r.Method == http.MethodGet {
+		singleEvent, err := storage.GetLatestBy(vars["id"])
+		if err != nil {
+			log.Error("can't get latest value", err)
+			w.WriteHeader(http.StatusInternalServerError)
+		} else {
+			json.NewEncoder(w).Encode(singleEvent)
+		}
 	}
 }
 
 func getSensorList(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	sensorList := storage.GetSensorList()
+	setupCORS(w)
 
-	json.NewEncoder(w).Encode(sensorList.Data)
+	if r.Method == http.MethodGet {
+		sensorList := storage.GetSensorList()
 
+		json.NewEncoder(w).Encode(sensorList.Data)
+	}
+
+}
+
+func setupCORS(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	w.Header().Set("Access-Control-Allow-Method", "GET")
+	w.Header().Set("Accept", "*/*")
 }
 
 func setupEnv() {

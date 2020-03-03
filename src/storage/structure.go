@@ -9,7 +9,7 @@ type Event struct {
 	DeviceId    string    `json:"deviceId"`
 	Co2         int       `json:"cO2"`
 	Temperature float32   `json:"temperature"`
-	Humidity    int       `json:"humidity"`
+	Humidity    float32   `json:"humidity"`
 }
 
 type Sensor struct {
