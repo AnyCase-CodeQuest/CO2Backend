@@ -41,10 +41,8 @@ func createEvent(w http.ResponseWriter, r *http.Request) {
 	json.Unmarshal(reqBody, &newEvent)
 	err = storage.Create(newEvent)
 
-	if os.Getenv(values.EnvSendToQueue) == "1" {
-		msg, _ := json.Marshal(newEvent)
-		go message.SendMessageToQueue(msg)
-	}
+	msg, _ := json.Marshal(newEvent)
+	go message.SendMessageToQueue(msg)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

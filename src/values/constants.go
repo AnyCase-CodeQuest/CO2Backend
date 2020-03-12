@@ -5,7 +5,6 @@ const QueueTTL int = 20
 const EnvQueueHost string = "QUEUE_SERVER_HOST"
 const EnvQueuePort string = "QUEUE_SERVER_PORT"
 const EnvQueueName string = "QUEUE_NAME"
-const EnvSendToQueue string = "SEND_TO_QUEUE"
 
 const EnvEnv string = "ENV"
 const EnvProd string = "production"

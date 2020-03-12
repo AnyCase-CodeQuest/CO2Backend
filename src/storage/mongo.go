@@ -5,6 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	auth2 "go.mongodb.org/mongo-driver/x/mongo/driver/auth"
 	"log"
 	"os"
 )
@@ -15,7 +16,11 @@ func InitClient() {
 	if isConnectionActive() != true {
 		log.Println("made new connection")
 		clientOptions := options.Client().ApplyURI(os.Getenv("DATABASE_CONNECTION"))
-		auth := options.Credential{Password: os.Getenv("PASSWORD"), Username: os.Getenv("USERNAME")}
+		auth := options.Credential{
+			Password:      os.Getenv("PASSWORD"),
+			Username:      os.Getenv("USERNAME"),
+			AuthMechanism: auth2.SCRAMSHA1,
+			AuthSource:    os.Getenv("USERNAME")}
 		clientOptions.SetAuth(auth)
 		var err error
 		Client, err = mongo.NewClient(clientOptions)
